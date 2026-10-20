@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!--
+  麦肯锡表达演示页 · 9:16 模板与组件库
+  ============================================================
+  这是一个「可直接预览的完整示例 + 版式组件库」。
+  示例主题：深度工作环境（仅用于演示各版式，使用时整体替换为你的内容）。
+
+  使用方式（详见 SKILL.md）：
+  1. 先设计 storyline：为每页写一句结论式 Action Title（<h2>）。
+  2. 为每页选版式：从下面带 "========== 版式：XXX ==========" 注释的 <section> 中挑选。
+  3. 删掉用不到的 section，复制需要的，按 storyline 顺序排列，填入内容。
+  4. 每个 <section> 用 data-part 标注它所属的逻辑模块（页眉左上角会显示）。
+  5. 保持视觉规范：留白充足、强调克制（强调色只给关键结论/数字）、Action Title 是完整结论句。
+
+  可用版式：cover / scqa / governing / pyramid / parallel / comparison
+            / matrix / air-rain-umbrella / process / takeaway
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>麦肯锡表达演示页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFFFFF;
+    --mist:#F4F6F8;
+    --mist-2:#EAEEF2;
+    --ink:#0A1F33;        /* 标题/正文 深墨蓝 */
+    --slate:#56646F;      /* 次要文字 */
+    --slate-2:#8B98A3;    /* 更浅文字 */
+    --line:#E1E6EB;       /* 细线 */
+    --line-2:#CAD2DA;
+    --navy:#0A2540;       /* 主色块 */
+    --blue:#1F6FEB;       /* 强调蓝 */
+    --blue-soft:#E8F0FE;  /* 强调蓝浅底 */
+    --red:#E5341E;        /* 极少用：冲突/警示点睛 */
+    --shadow:0 1.2cqh 3.4cqh rgba(10,31,51,.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;}
+  body{
+    background:#0E1318;font-family:"Noto Sans SC",-apple-system,"PingFang SC",sans-serif;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--ink);
+  }
+  .stage{
+    position:relative;height:100vh;aspect-ratio:9/16;max-width:100vw;
+    background:var(--paper);overflow:hidden;container-type:size;box-shadow:0 0 80px rgba(0,0,0,.55);
+  }
+  @media (max-aspect-ratio:9/16){ .stage{height:auto;width:100vw;} }
+
+  /* 顶部品牌细线 + 进度 */
+  .topline{position:absolute;top:0;left:0;right:0;height:.55cqh;background:var(--mist-2);z-index:60;}
+  .progress{position:absolute;top:0;left:0;height:.55cqh;width:0;background:var(--blue);z-index:61;transition:width .5s cubic-bezier(.4,0,.2,1);}
+
+  /* 页眉：左=逻辑模块，右=主题 */
+  .header{position:absolute;top:4.6cqh;left:7cqw;right:7cqw;z-index:30;display:flex;justify-content:space-between;align-items:center;}
+  .header .part{font-family:"Inter",sans-serif;font-weight:600;font-size:2cqh;letter-spacing:.14em;color:var(--blue);text-transform:uppercase;}
+  .header .topic{font-size:1.95cqh;letter-spacing:.12em;color:var(--slate-2);font-weight:500;}
+
+  /* 页脚：来源 + 页码 */
+  .footer{position:absolute;bottom:4cqh;left:7cqw;right:7cqw;z-index:30;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:2.4cqh;}
+  .footer .src{font-size:1.85cqh;letter-spacing:.04em;color:var(--slate-2);}
+  .footer .pg{font-family:"Inter",sans-serif;font-size:2cqh;color:var(--slate);}
+  .footer .pg b{color:var(--ink);font-weight:700;}
+
+  /* slide 容器 */
+  .slides{position:absolute;inset:0;z-index:10;}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+    padding:12cqh 7cqw 11cqh;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s;}
+  .slide.active{opacity:1;visibility:visible;}
+  .slide .anim{opacity:0;transform:translateY(2.2cqh);}
+  .slide.active .anim{animation:rise .65s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:var(--d,0s);}
+  @keyframes rise{to{opacity:1;transform:translateY(0);}}
+
+  /* ---- 通用排版件 ---- */
+  .kicker{display:flex;align-items:center;gap:1.6cqw;font-size:2.1cqh;font-weight:700;letter-spacing:.04em;color:var(--blue);margin-bottom:2.4cqh;}
+  .kicker .en{font-family:"Inter",sans-serif;font-weight:500;font-size:1.7cqh;letter-spacing:.16em;color:var(--slate-2);text-transform:uppercase;}
+  .kicker::before{content:"";width:3.4cqw;height:.45cqh;background:var(--blue);}
+  /* Action Title：每页一句结论性陈述 */
+  .action{font-weight:900;font-size:4.7cqh;line-height:1.34;letter-spacing:.005em;color:var(--ink);}
+  .action .em{color:var(--blue);}
+  .action .mark{box-shadow:inset 0 -1.1cqh 0 var(--blue-soft);}
+  .note{font-size:2.4cqh;font-weight:300;color:var(--slate);line-height:1.7;}
+  .b{font-weight:700;} .blue{color:var(--blue);} .navy{color:var(--navy);}
+
+  /* ========================================================== */
+  /* 版式：封面 COVER                                            */
+  /* ========================================================== */
+  .cover{justify-content:center;padding:12cqh 8cqw;}
+  .cover .rule{width:14cqw;height:.6cqh;background:var(--blue);margin-bottom:5cqh;}
+  .cover .tag{font-family:"Inter",sans-serif;font-size:2cqh;letter-spacing:.22em;color:var(--slate-2);text-transform:uppercase;margin-bottom:4cqh;}
+  .cover h1{font-family:"Noto Sans SC";font-weight:900;font-size:8.2cqh;line-height:1.26;color:var(--ink);}
+  .cover h1 .em{color:var(--blue);}
+  .cover .sub{font-size:2.9cqh;font-weight:300;color:var(--slate);line-height:1.7;margin-top:4.5cqh;max-width:78cqw;}
+  .cover .by{margin-top:7cqh;display:flex;align-items:center;gap:2.4cqw;font-size:2cqh;color:var(--slate-2);}
+  .cover .by .dot{width:1.6cqw;height:1.6cqw;border-radius:50%;background:var(--blue);}
+
+  /* ========================================================== */
+  /* 版式：SCQA 开场（情境-冲突-疑问-答案）                       */
+  /* ========================================================== */
+  .scqa{margin-top:3cqh;display:flex;flex-direction:column;gap:2.4cqh;}
+  .scqa .row{display:flex;gap:3.4cqw;align-items:flex-start;}
+  .scqa .tagcol{flex:none;width:17cqw;}
+  .scqa .tagcol .zh{font-weight:700;font-size:2.7cqh;color:var(--ink);}
+  .scqa .tagcol .en{font-family:"Inter",sans-serif;font-size:1.6cqh;letter-spacing:.12em;color:var(--slate-2);text-transform:uppercase;}
+  .scqa .txt{font-size:2.7cqh;line-height:1.5;color:var(--slate);border-left:1px solid var(--line);padding-left:3.4cqw;}
+  .scqa .row.answer .tagcol .zh{color:var(--blue);}
+  .scqa .row.answer .txt{color:var(--ink);font-weight:700;border-left-color:var(--blue);}
+
+  /* ========================================================== */
+  /* 版式：核心论点 GOVERNING THOUGHT（金字塔顶 / 金句页）        */
+  /* ========================================================== */
+  .governing{justify-content:center;}
+  .governing .quote{font-family:"Noto Serif SC";font-weight:900;font-size:6.4cqh;line-height:1.4;color:var(--ink);}
+  .governing .quote .em{color:var(--blue);}
+  .governing .by{margin-top:5cqh;font-size:2.3cqh;color:var(--slate);letter-spacing:.04em;}
+
+  /* ========================================================== */
+  /* 版式：金字塔 PYRAMID（以上统下：1 主张 + 3 支撑）            */
+  /* ========================================================== */
+  .pyr{margin-top:3.4cqh;display:flex;flex-direction:column;align-items:center;gap:2.6cqh;}
+  .pyr .top{width:74cqw;background:var(--navy);color:#fff;border-radius:2cqw;padding:3.4cqh 4cqw;text-align:center;box-shadow:var(--shadow);}
+  .pyr .top .lbl{font-family:"Inter",sans-serif;font-size:1.7cqh;letter-spacing:.16em;color:#8FB4E8;text-transform:uppercase;}
+  .pyr .top .t{font-weight:700;font-size:3.4cqh;line-height:1.35;margin-top:1cqh;}
+  .pyr .arrows{display:flex;gap:18cqw;color:var(--line-2);font-size:2.6cqh;}
+  .pyr .legs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2.6cqw;width:100%;}
+  .pyr .leg{background:#fff;border:1px solid var(--line);border-top:.6cqh solid var(--blue);border-radius:1.4cqw;padding:2.8cqh 2.4cqw;box-shadow:var(--shadow);}
+  .pyr .leg .n{font-family:"Inter",sans-serif;font-weight:700;font-size:2cqh;color:var(--blue);}
+  .pyr .leg .t{font-weight:700;font-size:2.5cqh;line-height:1.32;color:var(--ink);margin-top:1.2cqh;}
+  .pyr .mece{margin-top:.6cqh;font-family:"Inter",sans-serif;font-size:1.8cqh;letter-spacing:.1em;color:var(--slate-2);}
+
+  /* ========================================================== */
+  /* 版式：并列要点 PARALLEL（MECE · 3 栏）                       */
+  /* ========================================================== */
+  .par{margin-top:3.6cqh;display:flex;flex-direction:column;gap:2.6cqh;}
+  .par .item{display:flex;gap:3.4cqw;align-items:flex-start;background:var(--mist);border-radius:1.8cqw;padding:3cqh 3.4cqw;}
+  .par .item .idx{flex:none;width:11cqw;text-align:center;}
+  .par .item .idx .zh{font-family:"Noto Serif SC";font-weight:900;font-size:5.4cqh;color:var(--blue);line-height:1;}
+  .par .item .idx .en{font-family:"Inter",sans-serif;font-size:1.6cqh;letter-spacing:.12em;color:var(--slate-2);margin-top:.6cqh;text-transform:uppercase;}
+  .par .item .body .t{font-weight:700;font-size:3cqh;color:var(--ink);}
+  .par .item .body .d{font-size:2.3cqh;font-weight:300;color:var(--slate);line-height:1.55;margin-top:.8cqh;}
+  .par .item .body .tags{margin-top:1.6cqh;display:flex;flex-wrap:wrap;gap:1.4cqw;}
+  .par .item .body .tag{background:#fff;border:1px solid var(--line-2);color:var(--ink);font-weight:500;font-size:2.1cqh;border-radius:5cqw;padding:.7cqh 2.2cqw;}
+
+  /* ========================================================== */
+  /* 版式：对比 COMPARISON（A vs B / 现状 vs 目标）               */
+  /* ========================================================== */
+  .cmp{margin-top:3.6cqh;display:grid;grid-template-columns:1fr 1fr;gap:3cqw;}
+  .cmp .col{border-radius:2cqw;padding:3.4cqh 3cqw;box-shadow:var(--shadow);}
+  .cmp .col.a{background:#fff;border:1px solid var(--line);}
+  .cmp .col.b{background:var(--navy);}
+  .cmp .col .h{display:flex;align-items:center;gap:1.8cqw;font-weight:900;font-size:3cqh;padding-bottom:2.2cqh;margin-bottom:2.2cqh;border-bottom:1px solid;}
+  .cmp .col.a .h{color:var(--ink);border-color:var(--line);}
+  .cmp .col.b .h{color:#fff;border-color:rgba(255,255,255,.2);}
+  .cmp .col ul{list-style:none;display:flex;flex-direction:column;gap:2cqh;}
+  .cmp .col li{font-size:2.45cqh;line-height:1.4;display:flex;gap:1.6cqw;}
+  .cmp .col.a li{color:var(--slate);} .cmp .col.a li::before{content:"–";color:var(--slate-2);font-weight:700;}
+  .cmp .col.b li{color:#DCE7F5;} .cmp .col.b li::before{content:"+";color:#7FB2F0;font-weight:700;}
+
+  /* ========================================================== */
+  /* 版式：2x2 矩阵 MATRIX                                        */
+  /* ========================================================== */
+  .mtx{margin-top:3.4cqh;position:relative;padding:4cqh 0 0 7cqw;}
+  .mtx .axis-y{position:absolute;left:0;top:4cqh;bottom:7cqh;display:flex;align-items:center;}
+  .mtx .axis-y span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:2cqh;font-weight:700;color:var(--slate);letter-spacing:.06em;}
+  .mtx .axis-x{margin-top:1.6cqh;text-align:center;font-size:2cqh;font-weight:700;color:var(--slate);letter-spacing:.06em;}
+  .mtx .quad{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2.2cqw;}
+  .mtx .cell{border:1px solid var(--line);border-radius:1.4cqw;padding:2.6cqh 2.4cqw;min-height:18cqh;background:#fff;}
+  .mtx .cell.hot{background:var(--blue-soft);border-color:var(--blue);}
+  .mtx .cell .t{font-weight:700;font-size:2.5cqh;color:var(--ink);}
+  .mtx .cell .d{font-size:2cqh;font-weight:300;color:var(--slate);line-height:1.5;margin-top:.8cqh;}
+
+  /* ========================================================== */
+  /* 版式：空雨伞 AIR-RAIN-UMBRELLA（事实-解读-行动）             */
+  /* ========================================================== */
+  .ara{margin-top:3.4cqh;display:flex;flex-direction:column;gap:0;}
+  .ara .step{display:flex;gap:3.4cqw;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:1.8cqw;padding:3cqh 3.4cqw;box-shadow:var(--shadow);}
+  .ara .step .ic{flex:none;width:13cqw;text-align:center;}
+  .ara .step .ic .gly{font-size:4.6cqh;line-height:1;}
+  .ara .step .ic .zh{font-weight:700;font-size:2.2cqh;color:var(--ink);margin-top:.8cqh;}
+  .ara .step .ic .en{font-family:"Inter",sans-serif;font-size:1.5cqh;letter-spacing:.1em;color:var(--slate-2);text-transform:uppercase;}
+  .ara .step .tx .role{font-family:"Inter",sans-serif;font-size:1.8cqh;letter-spacing:.1em;color:var(--blue);text-transform:uppercase;}
+  .ara .step .tx .t{font-weight:700;font-size:2.7cqh;color:var(--ink);line-height:1.4;margin-top:.6cqh;}
+  .ara .ar{align-self:center;color:var(--line-2);font-size:2.8cqh;padding:1cqh 0;}
+  .ara .step.act{background:var(--navy);border:none;}
+  .ara .step.act .ic .zh,.ara .step.act .tx .t{color:#fff;}
+  .ara .step.act .tx .role{color:#8FB4E8;}
+
+  /* ========================================================== */
+  /* 版式：流程 PROCESS（步骤序列）                              */
+  /* ========================================================== */
+  .proc{margin-top:3.6cqh;position:relative;padding-left:9cqw;}
+  .proc::before{content:"";position:absolute;left:3.3cqw;top:3cqh;bottom:3cqh;width:.4cqh;background:var(--line);}
+  .proc .step{position:relative;display:flex;align-items:flex-start;gap:3.4cqw;padding:2cqh 0;}
+  .proc .step .node{position:absolute;left:-6.7cqw;width:6.6cqw;height:6.6cqw;border-radius:50%;background:#fff;border:.5cqh solid var(--blue);display:flex;align-items:center;justify-content:center;font-family:"Inter",sans-serif;font-weight:700;font-size:2.4cqh;color:var(--blue);}
+  .proc .step.hot .node{background:var(--blue);color:#fff;}
+  .proc .step .t{font-weight:700;font-size:3cqh;color:var(--ink);}
+  .proc .step .d{font-size:2.25cqh;font-weight:300;color:var(--slate);line-height:1.5;margin-top:.5cqh;}
+
+  /* ========================================================== */
+  /* 版式：结论 / 行动 TAKEAWAY                                  */
+  /* ========================================================== */
+  .take{justify-content:center;}
+  .take .big{font-family:"Noto Sans SC";font-weight:900;font-size:6cqh;line-height:1.36;color:var(--ink);}
+  .take .big .em{color:var(--blue);}
+  .take .acts{margin-top:5cqh;display:flex;flex-direction:column;gap:2cqh;}
+  .take .acts .a{display:flex;align-items:center;gap:2.8cqw;font-size:2.7cqh;font-weight:500;color:var(--ink);}
+  .take .acts .a .n{flex:none;width:6cqw;height:6cqw;border-radius:50%;background:var(--blue-soft);color:var(--blue);font-family:"Inter",sans-serif;font-weight:700;font-size:2.3cqh;display:flex;align-items:center;justify-content:center;}
+
+  /* 导航 */
+  .dots{position:absolute;bottom:1.4cqh;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:1.8cqw;}
+  .dots button{width:1.8cqw;height:1.8cqw;border-radius:50%;border:none;cursor:pointer;background:var(--line-2);transition:all .35s;padding:0;}
+  .dots button.on{width:6cqw;border-radius:1cqw;background:var(--blue);}
+  .nav-zone{position:absolute;top:9cqh;bottom:9cqh;width:30%;z-index:40;cursor:pointer;}
+  .nav-zone.left{left:0;} .nav-zone.right{right:0;}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="topline"></div><div class="progress" id="progress"></div>
+    <div class="header"><span class="part" id="hPart">COVER</span><span class="topic">深度工作 · 环境设计</span></div>
+
+    <div class="slides" id="slides">
+
+      <!-- ========== 版式：封面 COVER ========== -->
+      <section class="slide cover" data-part="封面">
+        <div class="rule anim" style="--d:.05s"></div>
+        <div class="tag anim" style="--d:.12s">A Working Note on Deep Work</div>
+        <h1 class="anim" style="--d:.2s">效率不是逼出来的,<br>是<span class="em">设计</span>出来的</h1>
+        <p class="sub anim" style="--d:.38s">为什么在家总是低效?<br>用三个维度,找到属于你的深度工作环境。</p>
+        <div class="by anim" style="--d:.56s"><span class="dot"></span>结构化表达 · 9:16 演示</div>
+      </section>
+
+      <!-- ========== 版式：SCQA 开场 ========== -->
+      <section class="slide" data-part="开场 · SCQA">
+        <div class="kicker anim" style="--d:.05s">先讲清问题 <span class="en">/ Setup</span></div>
+        <h2 class="action anim" style="--d:.13s">问题不在<span class="mark">自制力</span>,而在你<span class="em">所处的环境</span></h2>
+        <div class="scqa">
+          <div class="row anim" style="--d:.3s"><div class="tagcol"><div class="zh">情境</div><div class="en">Situation</div></div><div class="txt">我们都想在家,安静高效地完成想做的事。</div></div>
+          <div class="row anim" style="--d:.42s"><div class="tagcol"><div class="zh">冲突</div><div class="en">Complication</div></div><div class="txt">可一回家就心神不定、疲惫拖延,一天悄悄溜走。</div></div>
+          <div class="row anim" style="--d:.54s"><div class="tagcol"><div class="zh">疑问</div><div class="en">Question</div></div><div class="txt">问题真的出在"我不够自律"吗?</div></div>
+          <div class="row answer anim" style="--d:.66s"><div class="tagcol"><div class="zh">回答</div><div class="en">Answer</div></div><div class="txt">不是。工作能量本就波动,效率取决于环境。</div></div>
+        </div>
+      </section>
+
+      <!-- ========== 版式：核心论点 GOVERNING THOUGHT ========== -->
+      <section class="slide governing" data-part="核心主张">
+        <div class="kicker anim" style="--d:.05s">一句话结论 <span class="en">/ Governing Thought</span></div>
+        <p class="quote anim" style="--d:.18s">与其苦撑意志力,不如<span class="em">把自己放进对的环境</span>——<br>深度工作,是被环境设计出来的。</p>
+        <div class="by anim" style="--d:.5s">— 这是本篇要论证的中心论点</div>
+      </section>
+
+      <!-- ========== 版式：金字塔 PYRAMID ========== -->
+      <section class="slide" data-part="逻辑结构 · 金字塔">
+        <div class="kicker anim" style="--d:.05s">论证结构 <span class="en">/ Pyramid</span></div>
+        <h2 class="action anim" style="--d:.13s">三条相互独立的理由,共同支撑这个结论</h2>
+        <div class="pyr">
+          <div class="top anim" style="--d:.3s"><div class="lbl">Governing Thought</div><div class="t">选对环境,而非苦撑意志,<br>才能稳定进入深度工作</div></div>
+          <div class="arrows anim" style="--d:.4s"><span>↓</span><span>↓</span><span>↓</span></div>
+          <div class="legs">
+            <div class="leg anim" style="--d:.5s"><div class="n">01</div><div class="t">能量天然波动</div></div>
+            <div class="leg anim" style="--d:.6s"><div class="n">02</div><div class="t">环境决定沉浸</div></div>
+            <div class="leg anim" style="--d:.7s"><div class="n">03</div><div class="t">规律可被复用</div></div>
+          </div>
+          <div class="mece anim" style="--d:.82s">MECE — 相互独立 · 完全穷尽</div>
+        </div>
+      </section>
+
+      <!-- ========== 版式：对比 COMPARISON ========== -->
+      <section class="slide" data-part="理由 02 · 对比">
+        <div class="kicker anim" style="--d:.05s">证据:环境决定沉浸 <span class="en">/ Contrast</span></div>
+        <h2 class="action anim" style="--d:.13s">同一个人,换个空间就换了一种状态</h2>
+        <div class="cmp">
+          <div class="col a anim" style="--d:.32s">
+            <div class="h">🏠 在家里</div>
+            <ul><li>心思散乱</li><li>越坐越累</li><li>不断拖延</li><li>产出寥寥</li></ul>
+          </div>
+          <div class="col b anim" style="--d:.46s">
+            <div class="h">☕ 在咖啡馆</div>
+            <ul><li>迅速沉浸</li><li>深度思考</li><li>整块产出</li><li>高效一下午</li></ul>
+          </div>
+        </div>
+        <p class="note anim" style="--d:.64s;margin-top:3.4cqh">差别不在能力,而在<b class="blue">环境</b>。</p>
+      </section>
+
+      <!-- ========== 版式：并列要点 PARALLEL（MECE） ========== -->
+      <section class="slide" data-part="理由 03 · 方法">
+        <div class="kicker anim" style="--d:.05s">方法:用三个维度定位规律 <span class="en">/ MECE</span></div>
+        <h2 class="action anim" style="--d:.13s">从时间、空间、同伴三处,观察你自己</h2>
+        <div class="par">
+          <div class="item anim" style="--d:.32s"><div class="idx"><div class="zh">时</div><div class="en">When</div></div><div class="body"><div class="t">哪个时段你最清醒?</div><div class="tags"><span class="tag">上午</span><span class="tag">下午</span><span class="tag">晚上</span></div></div></div>
+          <div class="item anim" style="--d:.44s"><div class="idx"><div class="zh">境</div><div class="en">Where</div></div><div class="body"><div class="t">哪种空间让你沉浸?</div><div class="tags"><span class="tag">咖啡厅</span><span class="tag">家里</span><span class="tag">办公室</span><span class="tag">旅途中</span></div></div></div>
+          <div class="item anim" style="--d:.56s"><div class="idx"><div class="zh">人</div><div class="en">Who</div></div><div class="body"><div class="t">和谁在一起更专注?</div><div class="tags"><span class="tag">独处</span><span class="tag">有人同行</span><span class="tag">哪怕不说话</span></div></div></div>
+        </div>
+      </section>
+
+      <!-- ========== 版式：空雨伞 AIR-RAIN-UMBRELLA ========== -->
+      <section class="slide" data-part="从现象到行动 · 空雨伞">
+        <div class="kicker anim" style="--d:.05s">事实 → 解读 → 行动 <span class="en">/ Air · Rain · Umbrella</span></div>
+        <h2 class="action anim" style="--d:.13s">看见规律,就该据此行动</h2>
+        <div class="ara">
+          <div class="step anim" style="--d:.3s"><div class="ic"><div class="gly">☁️</div><div class="zh">空</div><div class="en">Fact</div></div><div class="tx"><div class="role">事实</div><div class="t">在家低效、在咖啡馆高效,反复发生。</div></div></div>
+          <div class="ar anim" style="--d:.4s">↓</div>
+          <div class="step anim" style="--d:.48s"><div class="ic"><div class="gly">🌧️</div><div class="zh">雨</div><div class="en">Read</div></div><div class="tx"><div class="role">解读</div><div class="t">效率由环境驱动,且因人而异、可被识别。</div></div></div>
+          <div class="ar anim" style="--d:.58s">↓</div>
+          <div class="step act anim" style="--d:.66s"><div class="ic"><div class="gly">☂️</div><div class="zh">伞</div><div class="en">Act</div></div><div class="tx"><div class="role">行动</div><div class="t">主动观测,并切换到属于你的高效环境。</div></div></div>
+        </div>
+      </section>
+
+      <!-- ========== 版式：流程 PROCESS ========== -->
+      <section class="slide" data-part="落地步骤 · 流程">
+        <div class="kicker anim" style="--d:.05s">四步,把规律变成习惯 <span class="en">/ Process</span></div>
+        <h2 class="action anim" style="--d:.13s">记录、复盘、定位、复用,形成闭环</h2>
+        <div class="proc">
+          <div class="step anim" style="--d:.3s"><div class="node">1</div><div><div class="t">记录</div><div class="d">每次工作,标注时间 / 地点 / 同伴与状态。</div></div></div>
+          <div class="step anim" style="--d:.42s"><div class="node">2</div><div><div class="t">复盘</div><div class="d">一周回看,哪些组合让你进入了深度。</div></div></div>
+          <div class="step anim" style="--d:.54s"><div class="node">3</div><div><div class="t">定位</div><div class="d">圈出你的"高效组合"——专属的环境配方。</div></div></div>
+          <div class="step hot anim" style="--d:.66s"><div class="node">4</div><div><div class="t">复用</div><div class="d">把重要的事,刻意安排进这些组合里。</div></div></div>
+        </div>
+      </section>
+
+      <!-- ========== 版式：结论 / 行动 TAKEAWAY ========== -->
+      <section class="slide take" data-part="结论">
+        <div class="kicker anim" style="--d:.05s">带走这一点 <span class="en">/ Takeaway</span></div>
+        <p class="big anim" style="--d:.16s">停止与自己<span class="em">对抗</span>,<br>开始<span class="em">设计</span>你的高效环境。</p>
+        <div class="acts">
+          <div class="a anim" style="--d:.42s"><span class="n">1</span>效率低时,不责怪自己,先换环境</div>
+          <div class="a anim" style="--d:.54s"><span class="n">2</span>用时 / 境 / 人,记录并找到你的规律</div>
+          <div class="a anim" style="--d:.66s"><span class="n">3</span>把想做的事,放进对的环境里完成</div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="footer"><span class="src">结构化表达演示 · McKinsey-style</span><span class="pg"><b id="cur">01</b> / <span id="total">09</span></span></div>
+    <div class="nav-zone left" id="navL"></div>
+    <div class="nav-zone right" id="navR"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+<script>
+  const slides=Array.from(document.querySelectorAll('.slide'));
+  const dotsWrap=document.getElementById('dots');
+  const progress=document.getElementById('progress');
+  const curEl=document.getElementById('cur'), totalEl=document.getElementById('total'), hPart=document.getElementById('hPart');
+  let i=0;
+  totalEl.textContent=String(slides.length).padStart(2,'0');
+  slides.forEach((_,idx)=>{const b=document.createElement('button');b.addEventListener('click',()=>go(idx));dotsWrap.appendChild(b);});
+  const dots=Array.from(dotsWrap.children);
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,idx)=>s.classList.toggle('active',idx===i));
+    dots.forEach((d,idx)=>d.classList.toggle('on',idx===i));
+    progress.style.width=((i+1)/slides.length*100)+'%';
+    curEl.textContent=String(i+1).padStart(2,'0');
+    hPart.textContent=slides[i].dataset.part||'';
+  }
+  const next=()=>go(i+1), prev=()=>go(i-1);
+  document.getElementById('navR').addEventListener('click',next);
+  document.getElementById('navL').addEventListener('click',prev);
+  window.addEventListener('keydown',e=>{
+    if(['ArrowRight',' ','Enter','PageDown'].includes(e.key)){e.preventDefault();next();}
+    if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev();}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);
+  });
+  go(0);
+</script>
+</body>
+</html>
