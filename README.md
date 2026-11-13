@@ -38,6 +38,14 @@
 
 视频技能需要 Node 18+ 和 ffmpeg。配音读环境变量 `TTS_BASE_URL` 和 `TTS_API_KEY`，填任何提供 MiniMax `speech-2.8-hd` 的 OpenAI 兼容服务即可。网页逐帧视频不配音也能出片，另外两个必须配。
 
+### 数据分析
+
+| 技能 | 作用 | 怎么叫它 |
+|---|---|---|
+| [finance-dashboard](finance-dashboard/) 财务仪表盘 | 把微信、支付宝导出的账单在本机解析归类，生成可视化财务仪表盘和洞察报告，看清钱从哪来、花在哪、哪块能省 | 「分析我的账单」「做个财务仪表盘」 |
+
+财务仪表盘只用 Python 3 标准库，账单只在本机处理，不上传。截图成 PNG 需要本机装有 Chrome、Chromium 或 Edge。没有账单可以先用 `scripts/make_sample.py` 生成一套虚构账单看效果。
+
 ### 开发
 
 | 技能 | 作用 | 怎么叫它 |
