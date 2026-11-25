@@ -1,6 +1,6 @@
 ---
 name: mac-setup-checklist
-description: "MacBook AI 工作环境配置教练：按一份顺序排好的清单，带不懂技术的人把 Mac 上干活要用的 AI 工具一个个装好、验证好。清单包括开工前检查（芯片、系统版本、开机密码、硬盘、网络）、Chrome、腾讯会议、ChatGPT 桌面版（含 Codex）、Obsidian、终端、Node.js 和国内镜像、Git、Claude Code、模型超市 API Key、CC Switch、MakerPilot 插件（在 Obsidian 里跟 Claude 和 Codex 对话），选装 VS Code 和 Get笔记。能自己在终端里查哪些已经装好、哪些还缺，只带对方补缺的那几项，每项装完都要验证，报错时对照常见问题排查。当用户说「帮我配电脑」「配置 AI 环境」「装 Claude Code」「装 Node.js」「电脑配置清单」「开课前准备」「检查我的电脑环境装好了没有」「command not found」「claude 打不开」「CC Switch 怎么填」「MakerPilot 怎么装」时使用。Mac 本身怎么用（截图、文件、快捷键），用 mac-starter-guide。"
+description: "MacBook AI 工作环境配置教练：按一份顺序排好的清单，带不懂技术的人把 Mac 上干活要用的 AI 工具一个个装好、验证好。清单包括开工前检查（芯片、系统版本、开机密码、硬盘、网络）、Chrome、腾讯会议、中文输入法（推荐微信输入法）、ChatGPT 桌面版（含 Codex）、Obsidian、终端、Node.js 和国内镜像、Git、Claude Code、模型超市 API Key、CC Switch、MakerPilot 插件（在 Obsidian 里跟 Claude 和 Codex 对话），选装 VS Code 和 Get笔记。能自己在终端里查哪些已经装好、哪些还缺，只带对方补缺的那几项，每项装完都要验证，报错时对照常见问题排查。当用户说「帮我配电脑」「配置 AI 环境」「装 Claude Code」「装 Node.js」「电脑配置清单」「开课前准备」「检查我的电脑环境装好了没有」「command not found」「claude 打不开」「CC Switch 怎么填」「MakerPilot 怎么装」时使用。Mac 本身怎么用（截图、文件、快捷键），用 mac-starter-guide。"
 ---
 
 # MacBook AI 工作环境配置教练（mac-setup-checklist）
@@ -14,17 +14,18 @@ description: "MacBook AI 工作环境配置教练：按一份顺序排好的清�
 | 0 | 开工前检查 | 必做 |
 | 1 | Chrome 浏览器 | 必装 |
 | 2 | 腾讯会议 | 必装 |
-| 3 | ChatGPT 桌面版（含 Codex） | 必装 |
-| 4 | Obsidian | 必装 |
-| 5 | 终端 | 不用装，学会打开 |
-| 6 | Node.js（并换 npm 国内镜像） | 必装 |
-| 7 | Git | 必装 |
-| 8 | Claude Code | 必装 |
-| 9 | 模型超市账号和 API Key | 必装 |
-| 10 | CC Switch | 必装 |
-| 11 | MakerPilot 插件 | 必装 |
-| 12 | VS Code | 选装：要做产品的才装 |
-| 13 | Get笔记 | 选装 |
+| 3 | 中文输入法（推荐微信输入法） | 必装（自带拼音也行） |
+| 4 | ChatGPT 桌面版（含 Codex） | 必装 |
+| 5 | Obsidian | 必装 |
+| 6 | 终端 | 不用装，学会打开 |
+| 7 | Node.js（并换 npm 国内镜像） | 必装 |
+| 8 | Git | 必装 |
+| 9 | Claude Code | 必装 |
+| 10 | 模型超市账号和 API Key | 必装 |
+| 11 | CC Switch | 必装 |
+| 12 | MakerPilot 插件 | 必装 |
+| 13 | VS Code | 选装：要做产品的才装 |
+| 14 | Get笔记 | 选装 |
 
 清单最后还有验收打勾表、常见问题总表、卡住了怎么办。
 
@@ -47,6 +48,7 @@ git --version
 claude --version
 curl -I -m 10 https://github.com
 ls /Applications | grep -iE "chrome|tencent|wemeet|chatgpt|codex|obsidian|cc switch|cc-switch|visual studio code"
+ls /Library/Input\ Methods ~/Library/Input\ Methods 2>/dev/null
 ```
 
 说明：
@@ -55,6 +57,7 @@ ls /Applications | grep -iE "chrome|tencent|wemeet|chatgpt|codex|obsidian|cc swi
 - `command not found` 说明还没装。
 - `node -v` 开头的数字小于 20，算没装好，要升级。
 - 腾讯会议在「应用程序」里的名字可能是 `TencentMeeting` 或 `腾讯会议`，查不到时直接问对方。
+- 输入法装在「输入法」文件夹里，不在「应用程序」。查不到微信输入法时，问对方能不能打中文；能打就算这一项完成，用系统自带拼音也行。
 - 查 MakerPilot：先问对方的 Obsidian 知识库放在哪，再看 `<知识库>/.obsidian/plugins/` 下有没有 `makerpilot` 文件夹。
 
 查完给对方一张表：哪些已经好了，哪些还缺。然后只带缺的那几项，按清单顺序来。
@@ -73,7 +76,7 @@ ls /Applications | grep -iE "chrome|tencent|wemeet|chatgpt|codex|obsidian|cc swi
 
 **能替对方做的：** 执行检查命令，执行 `npm config set registry ...` 这类不需要密码的配置命令，读报错信息并判断原因。
 
-**必须对方自己做的：** 输入开机密码，登录各种账号，注册、充值模型超市，在 CC Switch 里粘贴 API Key，点「仍要打开」放行软件。
+**必须对方自己做的：** 输入开机密码，在系统设置里添加输入法，登录各种账号，注册、充值模型超市，在 CC Switch 里粘贴 API Key，点「仍要打开」放行软件。
 
 ### 第三步：报错时
 
@@ -106,4 +109,4 @@ ls /Applications | grep -iE "chrome|tencent|wemeet|chatgpt|codex|obsidian|cc swi
 - 清单里「发到群里」「问我」「带练」指的是对方的老师或陪跑教练。对方没有老师时，就由你直接帮他排查。
 - 模型超市用哪家、接口地址是什么，清单没写死，以对方老师给的为准。对方没有，可以建议他找一家支持 Claude Code 的模型超市，接口地址看那家的文档。
 - ChatGPT 选哪个套餐，清单没写死。对方问起，说清各档套餐都包含 Codex，具体按自己的用量选。
-- MakerPilot 还没上架 Obsidian 插件市场，主装法是先装 BRAT，再用 BRAT 装 `https://github.com/zxmio/MakerPilot`；装不上就手动下载三个文件，步骤都在清单第 11 项。
+- MakerPilot 还没上架 Obsidian 插件市场，主装法是先装 BRAT，再用 BRAT 装 `https://github.com/zxmio/MakerPilot`；装不上就手动下载三个文件，步骤都在清单第 12 项。

@@ -15,7 +15,7 @@
 | 技能 | 作用 | 怎么叫它 |
 |---|---|---|
 | [mac-starter-guide](mac-starter-guide/) MacBook 上手教练 | 给第一次用 Mac、刚从 Windows 换过来的人讲清楚 Mac 怎么用：输入法、文件管理、快捷键、截图录屏、装卸软件、手机互传、常见问题 | 「教我用 Mac」「Mac 怎么截图」「下载的文件在哪」 |
-| [mac-setup-checklist](mac-setup-checklist/) MacBook AI 工作环境配置 | 先查电脑上缺什么，再按清单把 ChatGPT 桌面版、Obsidian、Node.js、Claude Code、CC Switch、MakerPilot 插件等一项项装好、验证好 | 「帮我配电脑」「检查我的环境装好了没有」 |
+| [mac-setup-checklist](mac-setup-checklist/) MacBook AI 工作环境配置 | 先查电脑上缺什么，再按清单把微信输入法、ChatGPT 桌面版、Obsidian、Node.js、Claude Code、CC Switch、MakerPilot 插件等一项项装好、验证好 | 「帮我配电脑」「检查我的环境装好了没有」 |
 
 建议先装这两个。用 ChatGPT 桌面版的 Codex 打开它们，AI 会在你电脑上自己检查、一步步带你装。
 
